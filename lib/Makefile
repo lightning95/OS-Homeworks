@@ -1,8 +1,8 @@
 run: lib
-	gcc -Wall -shared helpers.o -o libhelpers.so
+	gcc -Wall -std=c99 -shared helpers.o -o libhelpers.so
 
 lib: clean
-	gcc -Wall -c -fPIC helpers.c -o helpers.o
+	gcc -Wall -std=c99 -c -fPIC helpers.c -o helpers.o
 
 clean:
 	rm -f libhelpers.so
