@@ -7,3 +7,4 @@ lib: clean
 clean:
 	rm -f libhelpers.so
 	rm -f helpers.o
+	
