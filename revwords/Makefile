@@ -5,3 +5,4 @@ revwords: clean
 
 clean:
 	rm -f ./revwords
+	
