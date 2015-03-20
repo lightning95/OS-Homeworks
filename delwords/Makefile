@@ -5,3 +5,4 @@ delwords: clean
 
 clean:
 	rm -f ./delwords
+	
