@@ -2,7 +2,7 @@
 #include <string.h>
 #include <helpers.h>
 
-const ssize_t BUF_CAPACITY = 4096; // ~4096 + eps
+const ssize_t BUF_CAPACITY = 4096;
 const ssize_t MAX_WORD = 1024;
 
 int main(int argn, char** args) 
@@ -15,11 +15,8 @@ int main(int argn, char** args)
 		ssize_t rc = read_(STDIN_FILENO, buf + bc, BUF_CAPACITY - bc);
 		if (rc == 0)
 		{
-			if (bc > 0)
-			{
-				if (write_(STDOUT_FILENO, buf, bc) == -1)
-					return 2;
-			}
+			if (bc > 0 && write_(STDOUT_FILENO, buf, bc) == -1)
+				return 2;
 			break;
 		}
 		if (rc < 0)
@@ -34,16 +31,14 @@ int main(int argn, char** args)
 				++ok;
 			if (ok > 0 && (ok == len || i + ok == bc))
 			{
+				if (write_(STDOUT_FILENO, buf + last, i - last) == -1)
+						return 2;
 				if (ok == len)
 				{
-					if (write_(STDOUT_FILENO, buf + last, i - last) == -1)
-						return 2;
 					i += len;
 					last = i;
 				} else {
 					// print to i - 1, shift checkout	
-					if (write_(STDOUT_FILENO, buf + last, i - last) == -1)
-						return 2;
 					for (ssize_t j = 0; j < ok; ++j)
 						buf[j] = args[1][j];
 					bc = ok;
