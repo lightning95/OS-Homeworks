@@ -1,37 +1,57 @@
 #include <stdio.h>
 #include <helpers.h>
 
-const ssize_t BUF_SIZE = 4100; // ~4096 + eps
+const ssize_t BUF_CAPACITY = 4100; // ~4096 + eps
+const ssize_t MAX_WORD = 4096;
+
+void reverse(ssize_t len, char* buf)
+{
+	for (size_t i = 0; i < len / 2; ++i) 
+	{
+		char tmp = buf[i];
+		buf[i] = buf[len - i - 1];
+		buf[len - i - 1] = tmp;
+	}	
+}
 
 int main() 
 {
-	char buf[BUF_SIZE];
+	char buf[BUF_CAPACITY];
+	ssize_t bc = 0;
 	while (1) 
 	{
-		ssize_t rc = read_until(STDIN_FILENO, buf, BUF_SIZE, ' ');
-		if (rc <= 0)
+		ssize_t rc = read_until(STDIN_FILENO, buf + bc, BUF_CAPACITY - bc, ' ');
+		if (rc < 0)
 			return -rc;
-		size_t last = 0;
-		for (size_t j = 0; j < rc; ++j)
-			if (buf[j] == ' ')
-			{
-				for (size_t i = last; i < last + (j - last) / 2; ++i) 
-				{
-					char tmp = buf[i];
-					buf[i] = buf[j - (i - last) - 1];
-					buf[j - (i - last) - 1] = tmp;
-				}	
-				last = j + 1;
-			}
-		for (size_t i = last; i < last + (rc - last) / 2; ++i) 
+		if (rc == 0)
 		{
-			char tmp = buf[i];
-			buf[i] = buf[rc - (i - last) - 1];
-			buf[rc - (i - last) - 1] = tmp;
-		}	
-		ssize_t wc = write_(STDOUT_FILENO, buf, rc);
-		if (wc == -1)
-			return 2;
+			if (bc == 0)
+				break;
+			reverse(bc, buf);
+			if (write_(STDOUT_FILENO, buf, bc) == -1)
+				return 2;
+			break;
+		}
+		ssize_t i = bc, last;
+		bc += rc;		
+		for (last = 0; i < bc; ++i)
+			if (buf[i] == ' ')
+			{
+				reverse(i - last, buf + last);
+				if (write_(STDOUT_FILENO, buf + last, i - last + 1) == -1)
+					return 2;
+				last = i + 1;
+			}
+		if (bc - last == MAX_WORD) // clean buf
+		{
+			reverse(bc, buf);
+			if (write_(STDOUT_FILENO, buf, bc) == -1)
+				return 2;
+			last = bc;
+		}
+		bc -= last;
+		for (i = 0; i < bc; ++i) // shift buf
+			buf[i] = buf[i + last];
 	}
 	return 0;
 }
