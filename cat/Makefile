@@ -3,3 +3,4 @@ run: clean
 
 clean:
 	rm -f cat
+	
