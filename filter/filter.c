@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
 	char* args[argc];
 	for (int i = 0; i + 1 < argc; ++i) 
 		args[i] = argv[i + 1];
-	ssize_t bc;
+	ssize_t bc = 0, rc = 0;
 	char buf[BUF_CAP];
 	while (1)
 	{
@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
 				int status = spawn(args[0], args);
 				buf[i] = '\n';
 				if (status == 0 && write_(STDOUT_FILENO, buf + last, i - last + 1) < 0) 
-					return 1;					
+					return -1;
 				last = i + 1;
 			}
 		if (rc <= 0) 
@@ -38,5 +38,5 @@ int main(int argc, char* argv[])
 	int status = spawn(args[0], args);
 	if ((status == 0 && write_(STDOUT_FILENO, buf, bc) < 0) || status == 1) 
 		return 1;
-	return bc == 0 ? 0 : 1;
+	return rc == 0 ? 0 : 1;
 }
