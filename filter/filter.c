@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
 				int status = spawn(args[0], args);
 				buf[i] = '\n';
 				if (status == 0 && write_(STDOUT_FILENO, buf + last, i - last + 1) < 0) 
-					return -1;
+					return 1;
 				last = i + 1;
 			}
 		if (rc <= 0) 

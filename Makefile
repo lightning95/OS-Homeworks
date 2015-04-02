@@ -4,4 +4,5 @@ run:
 	cd revwords && make
 	cd delwords && make
 	cd filter && make
+	cd bufcat && make
 	
