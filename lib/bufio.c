@@ -69,7 +69,5 @@ ssize_t buf_flush(fd_t fd, struct buf_t * buf, size_t required)
     buf->size -= flushed;
     for (int i = 0; i < buf->size; i++)
         buf->buffer[i] = buf->buffer[i + flushed];
-    if (wc < 0)
-        return -1;
-    return 0;
+    return wc < 0 ? -1 : 0;
 }
