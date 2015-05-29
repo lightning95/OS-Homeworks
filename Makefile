@@ -5,4 +5,5 @@ run:
 	cd delwords && make
 	cd filter && make
 	cd bufcat && make
+	cd simplesh && make
 	
