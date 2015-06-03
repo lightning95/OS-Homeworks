@@ -7,4 +7,5 @@ run:
 	cd bufcat && make
 	cd simplesh && make
 	cd filesender && make
+	cd bipiper && make
 	

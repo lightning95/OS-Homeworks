@@ -6,6 +6,9 @@
 #include <string.h>
 #include <signal.h>
 
+int child_num;
+int* childa;
+
 struct execargs_t new_execargs_t(int argc, char** argv)
 {
     struct execargs_t ret;
@@ -23,56 +26,54 @@ int exec(struct execargs_t* args)
     return 0;
 }
  
-int childn;
-int* childa;
-
 void sig_handler(int sig) {
-    for (int i = 0; i < childn; i++) 
+    for (int i = 0; i < child_num; i++) 
         kill(childa[i], SIGKILL);
-    childn = 0;
+    child_num = 0;
+}
+
+int check_handler()
+{
+    struct sigaction sigact;
+    memset(&sigact, '\0', sizeof(sigact));
+    sigact.sa_handler = &sig_handler;
+    return sigaction(SIGINT, &sigact, NULL);
 }
 
 int runpiped(struct execargs_t** programs, size_t n) 
 {
-	if (n == 0)
-		return 0;
-	int pipefd[n - 1][2];
-	int child[n];	 
+	if (n == 0)    return 0;
+    int child[n], pipes[n - 1][2];
 	for (int i = 0; i + 1 < n; i++) 
-        if (pipe2(pipefd[i], O_CLOEXEC) < 0)
+        if (pipe2(pipes[i], O_CLOEXEC) < 0)
             return -1;
 
     for (int i = 0; i < n; i++) 
-    {
 		if (!(child[i] = fork())) 
 		{
-			if (i + 1 < n)
-				dup2(pipefd[i][1], STDOUT_FILENO);
-            if (i > 0)
-				dup2(pipefd[i - 1][0], STDIN_FILENO);
+			if (i + 1 < n && dup2(pipes[i][1], STDOUT_FILENO) < 0)   
+                return -1;
+            if (i > 0 && dup2(pipes[i - 1][0], STDIN_FILENO) < 0)   
+                return -1;
 			_exit(execvp(programs[i]->argv[0], programs[i]->argv));	
-		}
-        if (child[i] == -1)
+		} else if (child[i] < 0)     
             return -1;
-	}
+
 	for (int i = 0; i + 1 < n; i++) 
 	{
-		close(pipefd[i][1]);
-		close(pipefd[i][0]);
+		close(pipes[i][1]);
+		close(pipes[i][0]);
 	}
     
-    childn = n;
+    child_num = n;
     childa = (int*) child;
-    struct sigaction act;
-    memset(&act, '\0', sizeof(act));
-    act.sa_handler = &sig_handler;
-   
-    if (sigaction(SIGINT, &act, NULL) < 0) 
+
+    if (check_handler < 0)  
         return -1;
 
 	for (int i = 0, status; i < n; i++) 
         waitpid(child[i], &status, 0);
-    childn = 0;
+    child_num = 0;
     return 0;
 }
 

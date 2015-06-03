@@ -57,6 +57,16 @@ ssize_t buf_fill(fd_t fd, struct buf_t * buf, size_t required)
     return rc < 0 ? -1 : buf->size;
 }
 
+ssize_t buf_fill_once(fd_t fd, struct buf_t * buf)
+{
+    #ifdef DEBUG
+    if (!buf || required > buf->capacity)
+        abort();
+    #endif
+    ssize_t rc = read(fd, buf->buffer + buf->size, buf->capacity - buf->size);
+    return rc < 0 ? -1 : (buf->size += rc);
+}
+
 ssize_t buf_flush(fd_t fd, struct buf_t * buf, size_t required)
 {
     #ifdef DEBUG
