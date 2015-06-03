@@ -6,4 +6,5 @@ run:
 	cd filter && make
 	cd bufcat && make
 	cd simplesh && make
+	cd filesender && make
 	
