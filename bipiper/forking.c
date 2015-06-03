@@ -111,7 +111,7 @@ int main(int argn, char* argv[])
 		int f = fork();
 		if (f < 0)
 		{
-			perror("fork");	close(sock1); close(fd1); close(sock2); close(fd2);
+			perror("fork");	close(sock1); close(sock2); close(fd1); close(fd2);
 			return 1;
 		}
 		if (f == 0)
