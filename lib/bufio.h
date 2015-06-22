@@ -29,6 +29,8 @@ ssize_t buf_getline(fd_t fd, struct buf_t * buf, char* dest);
 
 ssize_t buf_write(fd_t fd, struct buf_t * buf, char* src, size_t len);
 
-ssize_t buf_fill_once(fd_t fd, struct buf_t * buf);
+ssize_t buf_fill_once(fd_t fd, struct buf_t* buf);
+
+void buf_clear(struct buf_t* buf);
 
 #endif

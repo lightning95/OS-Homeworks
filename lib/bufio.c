@@ -80,7 +80,7 @@ ssize_t buf_flush(fd_t fd, struct buf_t * buf, size_t required)
     buf->size -= flushed;
     for (int i = 0; i < buf->size; i++)
         buf->buffer[i] = buf->buffer[i + flushed];
-    return wc < 0 ? -1 : 0;
+    return wc < 0 ? -1 : wc;
 }
 
 ssize_t buf_getline(fd_t fd, struct buf_t * buf, char* dest)
@@ -145,4 +145,8 @@ ssize_t buf_write(fd_t fd, struct buf_t * buf, char* src, size_t len)
         buf->buffer[buf->size - 1] = src[i];
     }
     return len;
+}
+
+void buf_clear(struct buf_t* buf) {
+    buf->size = 0;
 }
